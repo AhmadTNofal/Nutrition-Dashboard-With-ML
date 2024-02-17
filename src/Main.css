@@ -52,6 +52,7 @@ font-family: "Poppins", sans-serif;
 --button-bg-dark: #005af0;
 --button-text-dark: #ffffff;
 --button-border-dark: 1px solid transparent;
+--card-h4: #ffffff;
 }
 html, body {
 width: 100%;
@@ -671,9 +672,7 @@ top: 10px;
 }
 .dark card h4{
     color: white;
-
 }
-
 .dark .btn:hover {
     background-color: var(--button-text-dark);
     color: var(--button-bg-dark);
