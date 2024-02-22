@@ -1,22 +1,25 @@
-import csv
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-@app.route('/login')
-def home():
+@app.route('/index.html')
+def index():
+    # This route will render the index.html template
     return render_template('index.html')
 
-@app.route('/dashboard')
-def dashboard():
-    # Open and read the CSV file
-    with open('data/FeedingDashboardData.csv', 'r') as file:
-        reader = csv.reader(file)
-        # Convert CSV data to list (or use any suitable data structure)
-        csv_data = list(reader)
-    
-#     # Pass the first row of CSV data (or any specific data you need) to the template
-#     return render_template('index.html', csv_text=csv_data[0][0])
+@app.route('/index', methods=['POST'])
+def upload_file():
+    # This route will handle the file upload
+    if 'file' in request.files:
+        file = request.files['file']
+        if file.filename != '':
+            # save and process files
+            pass
+    return redirect(url_for('index'))
 
-if __name__ == "__main__":
+@app.route('/graphs.html')
+def graphs():
+    return render_template('graphs.html')
+
+if __name__ == '__main__':
     app.run(debug=True)

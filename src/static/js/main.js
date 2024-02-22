@@ -61,7 +61,7 @@ input.addEventListener("change", function (e) {
     var fileName = e.target.files[0].name; // Get the name of the selected file
     // Create form to display the selected file name and an upload button
     let filedata = `
-        <form action="" method="post">
+        <form action="{{ url_for('upload') }}" method="post">
         <div class="form">
         <h4>${fileName}</h4>
         <button class="btn">Upload</button>
