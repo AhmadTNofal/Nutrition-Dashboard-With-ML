@@ -2,13 +2,22 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Select the mode switch element
     var modeSwitch = document.querySelector('.mode-switch');
-    
+
+    // Initialize dark mode from localStorage
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.documentElement.classList.add('dark');
+        modeSwitch.classList.add('active');
+    }
+
     // Add click event listener to the mode switch to toggle dark mode and active class
     modeSwitch.addEventListener('click', function () { 
         document.documentElement.classList.toggle('dark');
         modeSwitch.classList.toggle('active');
-    });
 
+        // Save the dark mode preference in localStorage
+        localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+    });
+    
     // Select the list view and grid view buttons
     var listView = document.querySelector('.list-view');
     var gridView = document.querySelector('.grid-view');
