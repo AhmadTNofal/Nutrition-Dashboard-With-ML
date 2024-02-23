@@ -1,13 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Replace with a random secret key
 
 @app.route('/')
 @app.route('/index.html')
 def index():
-    # This route will render the index.html template
-    # Check if 'dark_mode' is set in session and pass it to the template
+    # Render the index.html template with dark mode state
     dark_mode = 'dark' if session.get('dark_mode') else ''
     return render_template('index.html', dark_mode=dark_mode)
 
