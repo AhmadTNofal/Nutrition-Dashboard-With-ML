@@ -1,13 +1,48 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
 
 app = Flask(__name__)
 
 @app.route('/')
 @app.route('/index.html')
 def index():
-    # Render the index.html template with dark mode state
+    df = pd.read_csv('data\FeedingDashboardData.csv')
+
+    # Impute missing values with the mean
+    imputer = SimpleImputer(strategy='mean')
+    df.iloc[:, 1:-1] = imputer.fit_transform(df.iloc[:, 1:-1])
+
+    scaler = StandardScaler()
+    df.iloc[:, 1:-1] = scaler.fit_transform(df.iloc[:, 1:-1])
+
+    X = df.drop(['encounterId', 'referral'], axis=1)
+    y = df['referral']
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    svc = SVC(kernel='rbf', probability=True, random_state=42) 
+    svc.fit(X_train, y_train)
+
+    probabilities = svc.predict_proba(X_test)[:, 1]
+
+    threshold = 0.5
+    referral_needed = probabilities > threshold
+
+    # Store results in a list of dictionaries
+    results = [{'patient_number': i+1, 
+                'referral_probability': f"{prob:.2f}", 
+                'needs_referral': "Yes" if need else "No",
+                'color': "red" if need else "green"} 
+            for i, (prob, need) in enumerate(zip(probabilities*100, referral_needed))]
+
     dark_mode = 'dark' if session.get('dark_mode') else ''
-    return render_template('index.html', dark_mode=dark_mode)
+    # Pass the results to the template
+    return render_template('index.html', results=results, dark_mode=dark_mode)
+
 
 @app.route('/toggle-dark-mode', methods=['POST'])
 def toggle_dark_mode():

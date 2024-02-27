@@ -148,8 +148,9 @@
             </div>
           </div>
           <div class="project-boxes jsGridView">
+            {% for result in results %}
             <div class="project-box-wrapper">
-              <div class="project-box" style="background-color: #fee4cb">
+              <div class="project-box" style="background-color: light">
                 <div class="project-box-header">
                   <div class="more-wrapper">
                     <button class="project-btn-more">
@@ -161,191 +162,37 @@
                   </div>
                 </div>
                 <div class="project-box-content-header">
-                  <p class="box-content-header">Client 1</p>
-                  <p class="box-content-subheader">Client 1</p>
+                  <p class="box-content-header">Client {{ result.patient_number }}</p>
+                  <p class="box-content-subheader">Client {{ result.patient_number }}</p>
                 </div>
                 <div class="box-progress-wrapper">
-                  <p class="box-progress-header">Client 1</p>
+                  <p class="box-progress-header">Client {{ result.patient_number }}</p>
                   <div class="box-progress-bar">
                     <span
                       class="box-progress"
-                      style="width: 60%; background-color: #ff942e"
+                      style="width: {{ result.referral_probability }}%; background-color: {{ result.color }}"
                     ></span>
                   </div>
-                  <p class="box-progress-percentage">60%</p>
+                  <p class="box-progress-percentage">{{ result.referral_probability }}%</p>
                 </div>
                 <div class="project-box-footer">
                   <div class="participants">
+                    <p class = "Referral">
+                    Needs Referral: {{ result.needs_referral }}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="project-box-wrapper">
-              <div class="project-box" style="background-color: #e9e7fd">
-                <div class="project-box-header">
-                  <div class="more-wrapper">
-                    <button class="project-btn-more">
-                        <circle cx="12" cy="12" r="1" />
-                        <circle cx="12" cy="5" r="1" />
-                        <circle cx="12" cy="19" r="1" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                <div class="project-box-content-header">
-                  <p class="box-content-header">Client 2</p>
-                  <p class="box-content-subheader">Client 2</p>
-                </div>
-                <div class="box-progress-wrapper">
-                  <p class="box-progress-header">Client 2</p>
-                  <div class="box-progress-bar">
-                    <span
-                      class="box-progress"
-                      style="width: 50%; background-color: #4f3ff0"
-                    ></span>
-                  </div>
-                  <p class="box-progress-percentage">50%</p>
-                </div>
-                <div class="project-box-footer">
-                  <div class="participants">
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="project-box-wrapper">
-              <div class="project-box">
-                <div class="project-box-header">
-                  <div class="more-wrapper">
-                    <button class="project-btn-more">
-                        <circle cx="12" cy="12" r="1" />
-                        <circle cx="12" cy="5" r="1" />
-                        <circle cx="12" cy="19" r="1" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                <div class="project-box-content-header">
-                  <p class="box-content-header">Client 3</p>
-                  <p class="box-content-subheader">Client 3</p>
-                </div>
-                <div class="box-progress-wrapper">
-                  <p class="box-progress-header">Client 3</p>
-                  <div class="box-progress-bar">
-                    <span
-                      class="box-progress"
-                      style="width: 80%; background-color: #096c86"
-                    ></span>
-                  </div>
-                  <p class="box-progress-percentage">80%</p>
-                </div>
-                <div class="project-box-footer">
-                  <div class="participants">
-
-                    </button>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-            <div class="project-box-wrapper">
-              <div class="project-box" style="background-color: #ffd3e2">
-                <div class="project-box-header">
-                  <div class="more-wrapper">
-                    <button class="project-btn-more">
-                        <circle cx="12" cy="12" r="1" />
-                        <circle cx="12" cy="5" r="1" />
-                        <circle cx="12" cy="19" r="1" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                <div class="project-box-content-header">
-                  <p class="box-content-header">Client 4</p>
-                  <p class="box-content-subheader">Client 4</p>
-                </div>
-                <div class="box-progress-wrapper">
-                  <p class="box-progress-header">Client 4</p>
-                  <div class="box-progress-bar">
-                    <span
-                      class="box-progress"
-                      style="width: 20%; background-color: #df3670"
-                    ></span>
-                  </div>
-                  <p class="box-progress-percentage">20%</p>
-                </div>
-                <div class="project-box-footer">
-                  <div class="participants">
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="project-box-wrapper">
-              <div class="project-box" style="background-color: #c8f7dc">
-                <div class="project-box-header">
-                  <div class="more-wrapper">
-                    <button class="project-btn-more">
-                        <circle cx="12" cy="12" r="1" />
-                        <circle cx="12" cy="5" r="1" />
-                        <circle cx="12" cy="19" r="1" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                <div class="project-box-content-header">
-                  <p class="box-content-header">Client 5</p>
-                  <p class="box-content-subheader">Client 5</p>
-                </div>
-                <div class="box-progress-wrapper">
-                  <p class="box-progress-header">Client 5</p>
-                  <div class="box-progress-bar">
-                    <span
-                      class="box-progress"
-                      style="width: 60%; background-color: #34c471"
-                    ></span>
-                  </div>
-                  <p class="box-progress-percentage">60%</p>
-                </div>
-                <div class="project-box-footer">
-                  <div class="participants">
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="project-box-wrapper">
-              <div class="project-box" style="background-color: #d5deff">
-                <div class="project-box-header">
-                  <div class="more-wrapper">
-                    <button class="project-btn-more">
-                        <circle cx="12" cy="12" r="1" />
-                        <circle cx="12" cy="5" r="1" />
-                        <circle cx="12" cy="19" r="1" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                <div class="project-box-content-header">
-                  <p class="box-content-header">Client 6</p>
-                  <p class="box-content-subheader">Client 6</p>
-                </div>
-                <div class="box-progress-wrapper">
-                  <p class="box-progress-header">Client 6</p>
-                  <div class="box-progress-bar">
-                    <span
-                      class="box-progress"
-                      style="width: 40%; background-color: #4067f9"
-                    ></span>
-                  </div>
-                  <p class="box-progress-percentage">40%</p>
-                </div>
-                <div class="project-box-footer">
-                  <div class="participants">
-                  </div>
+            {% endfor %}
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+    <div>
         <div class="upload-selection">
           <button class="messages-close">
             <svg
