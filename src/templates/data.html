@@ -2,7 +2,7 @@
 <html class="{{ dark_mode }}">
 
   <head>
-    <title>Graphs</title>
+    <title>Data</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/Main.css') }}" />
   </head>
   
@@ -51,7 +51,7 @@
               <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
           </a>
-          <a href="graphs.html" class="app-sidebar-link active">
+          <a href="graphs.html" class="app-sidebar-link">
             <svg
               class="link-icon"
               width="24"
@@ -94,20 +94,10 @@
         </div>
         <div class="projects-section">
           <div class="projects-section-header">
-            <p>GRAPHS</p>
+            <p>DATA</p>
             <p class="time">{{ today }}</p>
           </div>
-          <div class="projects-section-line">
-            <div class="projects-status">
-              <div class="item-status">
-                <span class="status-number">{{ sum }}</span>
-                <span class="status-type">Current Patients</span>
-              </div>
-              <div class="item-status">
-                <span class="status-number">{{ count }}</span>
-                <span class="status-type">Need Referral</span>
-              </div>
-            </div>
+
             <div class="view-actions">
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>        
   </body>
