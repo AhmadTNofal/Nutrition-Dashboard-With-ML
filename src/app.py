@@ -11,7 +11,7 @@ app = Flask(__name__)
 @app.route('/index.html')
 def index():
     df = pd.read_csv('data\FeedingDashboardData.csv')
-
+    
     # Impute missing values with the mean
     imputer = SimpleImputer(strategy='mean')
     df.iloc[:, 1:-1] = imputer.fit_transform(df.iloc[:, 1:-1])
@@ -31,6 +31,12 @@ def index():
 
     threshold = 0.5
     referral_needed = probabilities > threshold
+    
+    #count the number of referrals needed
+    referrals = sum(referral_needed)
+
+    #count the sum of dont need refferal
+    count_no_referral = len(referral_needed) - referrals
 
     # Store results in a list of dictionaries
     results = [{'patient_number': i+1, 
@@ -41,7 +47,7 @@ def index():
 
     dark_mode = 'dark' if session.get('dark_mode') else ''
     # Pass the results to the template
-    return render_template('index.html', results=results, dark_mode=dark_mode)
+    return render_template('index.html', results=results,count = referrals,sum = count_no_referral+referrals, dark_mode=dark_mode)
 
 
 @app.route('/toggle-dark-mode', methods=['POST'])
