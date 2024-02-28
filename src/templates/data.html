@@ -97,8 +97,16 @@
             <p>DATA</p>
             <p class="time">{{ today }}</p>
           </div>
-
+          {% if data %}
+          <div class = "data-container">
+                  {% for key, value in data[0].items() %}
+                      <p class ="data-text">{{ key }}: {{ value }}</p>
+                  {% endfor %}
+          {% else %}
+              <p class = "data-text">No data found for the provided encounter ID.</p>
+          {% endif %}
+          </div>
             <div class="view-actions">
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>        
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>     
   </body>
 </html>

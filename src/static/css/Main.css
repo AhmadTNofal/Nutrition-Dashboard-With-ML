@@ -24,6 +24,7 @@ font-family: "Poppins", sans-serif;
 --search-area-bg: #fff;
 --star: #1ff1c2 e;
 --message-btn: #fff;
+--data-text: #1f1c2e;
 }
 .dark:root {
 --app-container: #1f1d2b;
@@ -53,6 +54,7 @@ font-family: "Poppins", sans-serif;
 --button-text-dark: #ffffff;
 --button-border-dark: 1px solid transparent;
 --card-h4: #ffffff;
+--data-text: #ffffff;
 }
 html, body {
 width: 100%;
@@ -683,4 +685,18 @@ top: 10px;
     font-size: 11.5px;
     color: #a3a3a3;
     font-weight: bold;
+}
+
+.data-container {
+    align-items: center;
+    margin-top: 20px;
+}
+
+.data-text {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 20px;
+    color: var(--data-text);
+    font-weight: bold;
+    margin-right: 10px;
+    align-items: center;
 }

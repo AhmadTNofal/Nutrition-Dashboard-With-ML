@@ -1,3 +1,4 @@
+import csv
 from flask import Flask, render_template, request, redirect, url_for, session
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -7,6 +8,16 @@ from sklearn.svm import SVC
 from datetime import date
 
 app = Flask(__name__)
+
+def get_data_by_encounter_id(encounter_id):
+    data = []
+    with open('data\FeedingDashboardData.csv', 'r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            if row['encounterId'] == encounter_id:
+                data.append(row)
+                break  # Assuming encounter_id is unique, break after finding the match
+    return data
 
 @app.route('/')
 
@@ -138,9 +149,10 @@ def graphs():
 def data():
     #today's date
     Today = date.today().strftime("%B %d, %Y")
-    # Render the data.html template with dark mode state
+    encounter_id = request.args.get('encounterId')
+    data = get_data_by_encounter_id(encounter_id)
     dark_mode = 'dark' if session.get('dark_mode') else ''
-    return render_template('data.html', today = Today, dark_mode=dark_mode)
+    return render_template('data.html', today = Today, data=data, dark_mode=dark_mode)
 
 if __name__ == '__main__':
     app.run(debug=True)
