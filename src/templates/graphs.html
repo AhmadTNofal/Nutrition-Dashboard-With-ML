@@ -71,44 +71,71 @@
             </svg>
           </a>
 
-          <a href="" class="app-sidebar-link">
-            <svg
-              class="link-icon"
-              width="24"
-              height="24"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              class="feather feather-settings"
-              viewBox="0 0 24 24"
-            >
-              <defs />
-              <circle cx="12" cy="12" r="3" />
-              <path
-                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"
-              />
-            </svg>
-          </a>
         </div>
         <div class="projects-section">
           <div class="projects-section-header">
             <p>GRAPHS</p>
+            <p> Current Patients: {{ sum }} </p>
+            <p> Need Referral: {{ count }} </p>
             <p class="time">{{ today }}</p>
           </div>
           <div class="projects-section-line">
             <div class="projects-status">
-              <div class="item-status">
-                <span class="status-number">{{ sum }}</span>
-                <span class="status-type">Current Patients</span>
-              </div>
-              <div class="item-status">
-                <span class="status-number">{{ count }}</span>
-                <span class="status-type">Need Referral</span>
+
+            
+              <div class="graph-container pie-chart-container">
+                <canvas id="pieChart"></canvas>
               </div>
             </div>
-            <div class="view-actions">
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>        
+
+              <div class="graph-container histogram-container">
+                <canvas id="histogram"></canvas>
+              </div>
+
+          </div>
+        </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+          var pieData = JSON.parse('{{ pie_data | safe }}');
+          var histogramData = JSON.parse('{{ histogram_data | safe }}');
+      
+          var ctxPie = document.getElementById('pieChart').getContext('2d');
+          var pieChart = new Chart(ctxPie, {
+              type: 'pie',
+              data: {
+                  labels: ['Needs Referral', 'No Referral'],
+                  datasets: [{
+                      data: pieData,
+                      backgroundColor: ['red', 'green'],
+                  }]
+              }
+          });
+      
+          var ctxHistogram = document.getElementById('histogram').getContext('2d');
+          var histogramChart = new Chart(ctxHistogram, {
+              type: 'bar',
+              data: {
+                  labels: histogramData.map((_, i) => `Patient ${i + 1}`),
+                  datasets: [{
+                      label: 'Confidence Score (%)',
+                      data: histogramData,
+                      backgroundColor: 'blue',
+                  }]
+              },
+              options: {
+                  scales: {
+                      y: {
+                          beginAtZero: true,
+                          responsive: true,
+                          maintainAspectRatio: false
+                      }
+                  }
+              }
+          });
+      });
+      </script>      
   </body>
 </html>

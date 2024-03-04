@@ -700,3 +700,27 @@ top: 10px;
     margin-right: 10px;
     align-items: center;
 }
+
+.graph-container {
+    width: 100%;
+    margin: auto;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.graph-container.pie-chart-container {
+    max-width: 400px;
+}
+
+.graph-container.histogram-container {
+    max-width: 600px;
+}
+
+.graph-container canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: auto;
+}
+
+

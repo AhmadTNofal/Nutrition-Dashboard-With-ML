@@ -5,6 +5,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
+from sklearn.pipeline import make_pipeline
+import json
 from datetime import date
 
 app = Flask(__name__)
@@ -23,60 +25,38 @@ def get_data_by_encounter_id(encounter_id):
 
 @app.route('/index.html')
 def index():
-    df = pd.read_csv('data\\FeedingDashboardData.csv')
+    # Load data
+    df = pd.read_csv("data/FeedingDashboardData.csv")
 
-    # Assuming 'encounterId' is the first column and 'referral' is the last
-    features_columns = df.columns[1:-1] 
+    # Columns for the new algorithm
+    X = df[['feed_vol', 'oxygen_flow_rate', 'resp_rate', 'bmi']]
+    y = df['referral']
 
-    # Threshold for minimum number of non-missing features to attempt a prediction
-    min_features_threshold = 5  # Example threshold, adjust based on your criteria
-
-    # Flag rows with insufficient data
-    df['sufficient_data'] = df[features_columns].notnull().sum(axis=1) >= min_features_threshold
-
-    # Split the DataFrame based on data sufficiency
-    df_sufficient_data = df[df['sufficient_data']].copy()
-    df_insufficient_data = df[~df['sufficient_data']].copy()
-
-    # Process rows with sufficient data for prediction
-    encounter_ids_sufficient = df_sufficient_data['encounterId']
-    X_sufficient = df_sufficient_data[features_columns]
-    y_sufficient = df_sufficient_data['referral']
-
-    imputer = SimpleImputer(strategy='mean')
-    X_imputed = imputer.fit_transform(X_sufficient)
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X_imputed)
-
-    X_train, X_test, y_train, y_test, ids_train, ids_test = train_test_split(
-        X_scaled, y_sufficient, encounter_ids_sufficient, test_size=0.2, random_state=42
+    # Pipeline for imputation, normalization, and model training
+    pipeline = make_pipeline(
+        SimpleImputer(strategy='median'),
+        StandardScaler(),
+        SVC(probability=True, random_state=42)
     )
 
-    model = SVC(kernel='rbf', probability=True, random_state=42)
-    model.fit(X_train, y_train)
-    probabilities = model.predict_proba(X_test)[:, 1]
-    referral_needed = probabilities > 0.5
+    # Train model on the entire dataset
+    pipeline.fit(X, y)
 
-    # Prepare results for clients with sufficient data
+    # Predict and calculate confidence scores
+    predicted_referrals = pipeline.predict(X)
+    probabilities = pipeline.predict_proba(X)
+    confidence_scores = probabilities.max(axis=1) * 100
+
+    # Prepare output
     results = [{
         'patient_number': i + 1,
-        'encounter_id': int(encounter_id),
-        'referral_probability': f"{prob:.2f}",
-        'needs_referral': "Yes" if need else "No",
-        'color': "red" if need else "green"
-    } for i, (encounter_id, prob, need) in enumerate(zip(ids_test, probabilities * 100, referral_needed))]
+        'encounter_id': int(row['encounterId']),
+        'referral_probability': f"{conf_score:.2f}",
+        'needs_referral': "Yes" if pred_referral else "No",
+        'color': "red" if pred_referral else "green"
+    } for i, (row, pred_referral, conf_score) in enumerate(zip(df.to_dict('records'), predicted_referrals, confidence_scores))]
 
-    # Add clients with insufficient data to results
-    for row in df_insufficient_data.itertuples():
-        results.append({
-            'patient_number': len(results) + 1,
-            'encounter_id': row.encounterId,
-            'referral_probability': "Missing Data",
-            'needs_referral': "N/A",
-            'color': "yellow"
-        })
-
-    referrals = sum(res['needs_referral'] == "Yes" for res in results if res['needs_referral'] != "N/A")
+    referrals = sum(res['needs_referral'] == "Yes" for res in results)
     count_no_referral = len(results) - referrals
     Today = date.today().strftime("%B %d, %Y")
     dark_mode = 'dark' if session.get('dark_mode') else ''
@@ -103,47 +83,56 @@ def upload_file():
 
 @app.route('/graphs.html')
 def graphs():
-    df = pd.read_csv('data\FeedingDashboardData.csv')
+    # Load data
+    df = pd.read_csv("data/FeedingDashboardData.csv")
 
-    # Impute missing values with the mean
-    imputer = SimpleImputer(strategy='mean')
-    df.iloc[:, 1:-1] = imputer.fit_transform(df.iloc[:, 1:-1])
-
-    scaler = StandardScaler()
-    df.iloc[:, 1:-1] = scaler.fit_transform(df.iloc[:, 1:-1])
-
-    X = df.drop(['encounterId', 'referral'], axis=1)
+    # Columns for the new algorithm
+    X = df[['feed_vol', 'oxygen_flow_rate', 'resp_rate', 'bmi']]
     y = df['referral']
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    # Pipeline for imputation, normalization, and model training
+    pipeline = make_pipeline(
+        SimpleImputer(strategy='median'),
+        StandardScaler(),
+        SVC(probability=True, random_state=42)
+    )
 
-    svc = SVC(kernel='rbf', probability=True, random_state=42) 
-    svc.fit(X_train, y_train)
+    # Train model on the entire dataset
+    pipeline.fit(X, y)
 
-    probabilities = svc.predict_proba(X_test)[:, 1]
+    # Predict and calculate confidence scores
+    predicted_referrals = pipeline.predict(X)
+    probabilities = pipeline.predict_proba(X)
+    confidence_scores = probabilities.max(axis=1) * 100
 
-    threshold = 0.5
-    referral_needed = probabilities > threshold
-    
-    #count the number of referrals needed
-    referrals = sum(referral_needed)
+    # Prepare output
+    results = [{
+        'patient_number': i + 1,
+        'encounter_id': int(row['encounterId']),
+        'referral_probability': f"{conf_score:.2f}",
+        'needs_referral': "Yes" if pred_referral else "No",
+        'color': "red" if pred_referral else "green"
+    } for i, (row, pred_referral, conf_score) in enumerate(zip(df.to_dict('records'), predicted_referrals, confidence_scores))]
 
-    #count the sum of dont need refferal
-    count_no_referral = len(referral_needed) - referrals
-
-    #today's date
+    referrals = sum(res['needs_referral'] == "Yes" for res in results)
+    count_no_referral = len(results) - referrals
     Today = date.today().strftime("%B %d, %Y")
-
-    # Store results in a list of dictionaries
-    results = [{'patient_number': i+1, 
-                'referral_probability': f"{prob:.2f}", 
-                'needs_referral': "Yes" if need else "No",
-                'color': "red" if need else "green"} 
-            for i, (prob, need) in enumerate(zip(probabilities*100, referral_needed))]
-
-    # Render the graphs.html template with dark mode state
     dark_mode = 'dark' if session.get('dark_mode') else ''
-    return render_template('graphs.html',results=results,count = referrals,sum = count_no_referral+referrals,today = Today, dark_mode=dark_mode)
+
+        # Prepare data for pie chart
+    needs_referral_count = sum(predicted_referrals)
+    no_referral_count = len(predicted_referrals) - needs_referral_count
+    pie_data = [needs_referral_count, no_referral_count]
+
+    # Prepare data for histogram
+    histogram_data = list(confidence_scores)
+
+    # Convert data to JSON for JavaScript
+    pie_data_json = json.dumps(pie_data)
+    histogram_data_json = json.dumps(histogram_data)
+
+    # Render the HTML template with the results
+    return render_template('graphs.html', results=results, count=referrals, sum=len(results), today=Today, dark_mode=dark_mode, pie_data=pie_data_json, histogram_data=histogram_data_json,)
 
 @app.route('/data.html')
 def data():
