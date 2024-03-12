@@ -217,7 +217,7 @@
               var upperVal = parseInt(document.getElementById('upper').value);
               var referral = document.getElementById('referral').value; // Assuming 'referral' is a text input or similar
       
-              // Send data to Flask server via POST request to '/index.html' (or another endpoint as configured)
+              // Send data to Flask server via POST request
               fetch('/updateAll', {
                   method: 'POST',
                   headers: {
@@ -225,9 +225,19 @@
                   },
                   body: JSON.stringify({lower: lowerVal, upper: upperVal, referral: referral}),
               })
-              .then(response => response.json())
+              .then(response => {
+                  if (!response.ok) {
+                      throw new Error('Network response was not ok');
+                  }
+                  return response.json();
+              })
               .then(data => {
                   console.log('Success:', data);
+                  // Ask the user if they want to refresh the page
+                  if (confirm("Are you sure you want to filter the data?")) {
+                      // If the user clicks "OK", refresh the page
+                      window.location.reload();
+                  }
               })
               .catch((error) => {
                   console.error('Error:', error);
@@ -237,7 +247,7 @@
       }
       
       updateAllButton();
-    </script>
+      </script>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
 <script>
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
