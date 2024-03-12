@@ -4,6 +4,53 @@
   <head>
     <title>Graphs</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/Main.css') }}" />
+    <style>
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 2;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+  
+      .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        height: 80%;
+        overflow: auto;
+      }
+  
+      .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+  
+      .close:hover,
+      .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
+  
+      .modal-content canvas {
+        width: 100%;
+        height: auto;
+      }
+  
+      .graph-container {
+        cursor: pointer; /* Indicates that the graphs are clickable */
+      }
+    </style>
   </head>
   
   <body>
@@ -71,6 +118,23 @@
             </svg>
           </a>
 
+          <a href="upload.html" class="app-sidebar-link">
+            <svg  class="link-icon"
+            width="24"
+            height="24"
+            fill="currentColor"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="0.3"
+            viewBox="0 0 16 16"
+            >
+              <defs />
+              <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+              <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/>
+            </svg>
+          </a>
+
         </div>
         <div class="projects-section">
           <div class="projects-section-header">
@@ -92,6 +156,13 @@
                 <canvas id="histogram"></canvas>
               </div>
 
+              <div id="myModal" class="modal">
+                <div class="modal-content">
+                  <span class="close">&times;</span>
+                  <canvas id="modalCanvas"></canvas>
+                </div>
+              </div>
+
           </div>
         </div>
 
@@ -99,43 +170,93 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
-          var pieData = JSON.parse('{{ pie_data | safe }}');
-          var histogramData = JSON.parse('{{ histogram_data | safe }}');
-      
-          var ctxPie = document.getElementById('pieChart').getContext('2d');
-          var pieChart = new Chart(ctxPie, {
-              type: 'pie',
-              data: {
-                  labels: ['Needs Referral', 'No Referral'],
-                  datasets: [{
-                      data: pieData,
-                      backgroundColor: ['red', 'green'],
-                  }]
+        // Parse data for charts
+        var pieData = JSON.parse('{{ pie_data | safe }}');
+        var histogramData = JSON.parse('{{ histogram_data | safe }}');
+  
+        // Initialize the pie chart
+        var ctxPie = document.getElementById('pieChart').getContext('2d');
+        var pieChart = new Chart(ctxPie, {
+          type: 'pie',
+          data: {
+            labels: ['Needs Referral', 'No Referral'],
+            datasets: [{
+              data: pieData,
+              backgroundColor: ['red', 'green'],
+            }]
+          }
+        });
+  
+        // Initialize the histogram
+        var ctxHistogram = document.getElementById('histogram').getContext('2d');
+        var histogramChart = new Chart(ctxHistogram, {
+          type: 'bar',
+          data: {
+            labels: histogramData.map((_, i) => `Patient ${i + 1}`),
+            datasets: [{
+              label: 'Confidence Score (%)',
+              data: histogramData,
+              backgroundColor: 'blue',
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+                responsive: true,
+                maintainAspectRatio: false
               }
+            }
+          }
+        });
+  
+        // Modal functionality
+        var modal = document.getElementById("myModal");
+        var span = document.getElementsByClassName("close")[0];
+    
+        // Function to show the modal with the given chart
+        function showModal(chart) {
+          modal.style.display = "block";
+          var modalCtx = document.getElementById("modalCanvas").getContext('2d');
+    
+          // Clear previous chart from modal if it exists
+          modalCtx.clearRect(0, 0, modalCanvas.width, modalCanvas.height);
+    
+          // Copy the chart into the modal canvas
+          new Chart(modalCtx, {
+            type: chart.config.type,
+            data: chart.data,
+            options: Object.assign({}, chart.options, { 
+              responsive: true,
+              maintainAspectRatio: true 
+            })
           });
-      
-          var ctxHistogram = document.getElementById('histogram').getContext('2d');
-          var histogramChart = new Chart(ctxHistogram, {
-              type: 'bar',
-              data: {
-                  labels: histogramData.map((_, i) => `Patient ${i + 1}`),
-                  datasets: [{
-                      label: 'Confidence Score (%)',
-                      data: histogramData,
-                      backgroundColor: 'blue',
-                  }]
-              },
-              options: {
-                  scales: {
-                      y: {
-                          beginAtZero: true,
-                          responsive: true,
-                          maintainAspectRatio: false
-                      }
-                  }
-              }
-          });
+        }
+    
+        // Attach onclick events to graphs
+        var pieCanvas = document.getElementById('pieChart');
+        var histogramCanvas = document.getElementById('histogram');
+        
+        pieCanvas.onclick = function() {
+          showModal(pieChart);
+        };
+    
+        histogramCanvas.onclick = function() {
+          showModal(histogramChart);
+        };
+    
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+          modal.style.display = "none";
+        };
+    
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+          if (event.target == modal) {
+            modal.style.display = "none";
+          }
+        };
       });
-      </script>      
+    </script>
   </body>
 </html>

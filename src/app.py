@@ -143,5 +143,14 @@ def data():
     dark_mode = 'dark' if session.get('dark_mode') else ''
     return render_template('data.html', today = Today, data=data, dark_mode=dark_mode)
 
+@app.route('/upload.html')
+def upload():
+    #today's date
+    Today = date.today().strftime("%B %d, %Y")
+    encounter_id = request.args.get('encounterId')
+    data = get_data_by_encounter_id(encounter_id)
+    dark_mode = 'dark' if session.get('dark_mode') else ''
+    return render_template('upload.html', today = Today, data=data, dark_mode=dark_mode)
+
 if __name__ == '__main__':
     app.run(debug=True)

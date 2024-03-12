@@ -79,3 +79,53 @@ input.addEventListener("change", function (e) {
     // Update the drop area with the form
     dropArea.innerHTML = filedata;
 });
+
+function updateLowerValue(val) {
+    var lowerLabel = document.getElementById('lower-label');
+    lowerLabel.innerHTML = val + '%';
+    
+    // Ensure the lower slider does not cross over the upper slider
+    var upperVal = parseInt(document.getElementById('upper').value);
+    if (parseInt(val) > upperVal) {
+        document.getElementById('lower').value = upperVal;
+        lowerLabel.innerHTML = upperVal + '%';
+    }
+}
+
+function updateUpperValue(val) {
+    var upperLabel = document.getElementById('upper-label');
+    upperLabel.innerHTML = val + '%';
+    
+    // Ensure the upper slider does not cross under the lower slider
+    var lowerVal = parseInt(document.getElementById('lower').value);
+    if (parseInt(val) < lowerVal) {
+        document.getElementById('upper').value = lowerVal;
+        upperLabel.innerHTML = lowerVal + '%';
+    }
+}
+
+function updateVisualTrack() {
+    var lowerVal = parseInt(document.getElementById('lower').value, 10);
+    var upperVal = parseInt(document.getElementById('upper').value, 10);
+    var maxVal = parseInt(document.getElementById('lower').max, 10);
+
+    var percentageLower = (lowerVal / maxVal) * 100;
+    var percentageUpper = (upperVal / maxVal) * 100;
+
+    var slider = document.querySelector('.multi-range-slider');
+    slider.style.setProperty('--range-width', `${percentageUpper - percentageLower}%`);
+    slider.style.setProperty('--range-start', `${percentageLower}%`);
+}
+
+  // Initialize visual track
+updateVisualTrack();
+
+  // Add event listeners
+document.getElementById('lower').addEventListener('input', function() {
+    updateLowerValue(this.value);
+    updateVisualTrack();
+});
+document.getElementById('upper').addEventListener('input', function() {
+    updateUpperValue(this.value);
+    updateVisualTrack();
+});
