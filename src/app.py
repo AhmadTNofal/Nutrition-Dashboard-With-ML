@@ -1,5 +1,6 @@
 import csv
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask_socketio import SocketIO, emit
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
@@ -10,6 +11,8 @@ import json
 from datetime import date
 
 app = Flask(__name__)
+socketio = SocketIO(app)
+
 
 def get_data_by_encounter_id(encounter_id):
     data = []
@@ -21,10 +24,31 @@ def get_data_by_encounter_id(encounter_id):
                 break  # Assuming encounter_id is unique, break after finding the match
     return data
 
-@app.route('/')
+def get_filtered_results(update_data, results, confidence_scores):
+    lower = update_data.get('lower', 0)
+    upper = update_data.get('upper', 100)
+    referral_filter = update_data.get('referral', None)
 
+    filtered_results = []
+    for result, confidence_score in zip(results, confidence_scores):
+        if lower <= confidence_score <= upper:
+            if referral_filter == "1" and result['needs_referral'] == "Yes":
+                filtered_results.append(result)
+            elif referral_filter == "0" and result['needs_referral'] == "No":
+                filtered_results.append(result)
+            elif referral_filter == "None":
+                filtered_results.append(result)
+    return filtered_results
+
+@app.route('/')
 @app.route('/index.html')
 def index():
+    try:
+        with open('update_data.json', 'r') as f:
+            update_data = json.load(f)
+    except FileNotFoundError:
+        update_data = {'lower': 0, 'upper': 100, 'referral': "None"}
+
     # Load data
     df = pd.read_csv("data/FeedingDashboardData.csv")
 
@@ -47,8 +71,8 @@ def index():
     probabilities = pipeline.predict_proba(X)
     confidence_scores = probabilities.max(axis=1) * 100
 
-    # Prepare output
-    results = [{
+    # Prepare initial output
+    initial_results = [{
         'patient_number': i + 1,
         'encounter_id': int(row['encounterId']),
         'referral_probability': f"{conf_score:.2f}",
@@ -56,13 +80,30 @@ def index():
         'color': "red" if pred_referral else "green"
     } for i, (row, pred_referral, conf_score) in enumerate(zip(df.to_dict('records'), predicted_referrals, confidence_scores))]
 
+    # Filter results based on update_data criteria
+    results = get_filtered_results(update_data, initial_results, confidence_scores)
+
     referrals = sum(res['needs_referral'] == "Yes" for res in results)
     count_no_referral = len(results) - referrals
     Today = date.today().strftime("%B %d, %Y")
     dark_mode = 'dark' if session.get('dark_mode') else ''
 
-    # Render the HTML template with the results
+    # Render the HTML template with the filtered results
     return render_template('index.html', results=results, count=referrals, sum=len(results), today=Today, dark_mode=dark_mode)
+
+@app.route('/updateAll', methods=['POST'])
+def update_all():
+    data = request.get_json()  # Get JSON data sent from the client
+
+    # Process the data as before
+    # Example: Update 'update_data.json' with the received data
+    with open('update_data.json', 'w') as f:
+        json.dump(data, f)
+
+    # Correctly emit an event to all clients
+    socketio.emit('data_updated', data, room=None)  # Correct use of emit for broadcasting
+
+    return jsonify({'status': 'success'})
 
 @app.route('/toggle-dark-mode', methods=['POST'])
 def toggle_dark_mode():
@@ -153,4 +194,4 @@ def upload():
     return render_template('upload.html', today = Today, data=data, dark_mode=dark_mode)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True)

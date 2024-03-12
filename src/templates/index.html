@@ -113,12 +113,12 @@
                 </div>
               </div>
               <p style="font-size: 15px; margin-left: 20px;">Referral?</p>
-              <select class="updateAll" style="margin-left: 7.5px">
+              <select class="updateAll" id="referral" style="margin-left: 7.5px">
                 <option selected>None</option>
                 <option value="1">Yes</option>
                 <option value="2">No</option>
               </select>
-              <button name="updateAll" class="updateAll" style="margin-left: 20px;">Update All</button>
+              <button name="updateAll" id="updateAll" class="updateAll" style="margin-left: 20px;">Update All</button>
             </div>
             </div>
             <div class="view-actions">
@@ -209,5 +209,44 @@
       </div>
     </div>
       <script src="{{ url_for('static', filename='js/main.js') }}"></script> 
+      <script>
+        function updateAllButton() {
+          document.getElementById('updateAll').onclick = function() {
+              // Capture values from the input fields
+              var lowerVal = parseInt(document.getElementById('lower').value);
+              var upperVal = parseInt(document.getElementById('upper').value);
+              var referral = document.getElementById('referral').value; // Assuming 'referral' is a text input or similar
+      
+              // Send data to Flask server via POST request to '/index.html' (or another endpoint as configured)
+              fetch('/updateAll', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({lower: lowerVal, upper: upperVal, referral: referral}),
+              })
+              .then(response => response.json())
+              .then(data => {
+                  console.log('Success:', data);
+              })
+              .catch((error) => {
+                  console.error('Error:', error);
+              });
+              
+          }
+      }
+      
+      updateAllButton();
+    </script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+<script>
+  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+
+  socket.on('data_updated', function(data) {
+    // React to the data update event
+    console.log('Data updated', data);
+    // Here, you might want to refetch data for your page or directly update the UI
+  });
+</script>
   </body>
 </html>
