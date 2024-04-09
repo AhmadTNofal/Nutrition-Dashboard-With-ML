@@ -1,5 +1,6 @@
 import csv
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+import os
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
 from flask_socketio import SocketIO, emit
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -8,11 +9,52 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.pipeline import make_pipeline
 import json
+from werkzeug.utils import secure_filename
 from datetime import date
 
 app = Flask(__name__)
 socketio = SocketIO(app)
+app.secret_key = '123456'
 
+data_folder = 'data'
+UPLOAD_FOLDER = 'data'  # Specify your uploads directory
+ALLOWED_EXTENSIONS = {'csv'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def recent_file(): 
+    # Get all files in the folder
+    files_in_folder = os.listdir(data_folder)
+
+    # Filter out only CSV files
+    csv_files = [file for file in files_in_folder if file.endswith('.csv')]
+
+    # Check if there are any CSV files in the folder
+    if csv_files:
+        # Assume the first CSV file is the most recent initially
+        data_recent_file_name = csv_files[0]
+        # Fetch the creation time (or the closest equivalent) of the first file
+        most_recent_file_time = os.path.getctime(os.path.join(data_folder, data_recent_file_name))
+
+        # Loop through the CSV files to find the most recent
+        for file in csv_files:
+            file_path = os.path.join(data_folder, file)
+            # Use getctime() to get the file creation time
+            file_time = os.path.getctime(file_path)
+
+            # Update if this file's creation time is more recent
+            if file_time > most_recent_file_time:
+                most_recent_file_time = file_time
+                data_recent_file_name = file
+
+        return data_recent_file_name
+    else:
+        print("No CSV files found in the folder.")
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def get_data_by_encounter_id(encounter_id):
     data = []
@@ -43,6 +85,11 @@ def get_filtered_results(update_data, results, confidence_scores):
 @app.route('/')
 @app.route('/index.html')
 def index():
+    data_file = recent_file()
+    if data_file is None:
+        flash("No CSV files found in the folder.")
+        return redirect(url_for('upload'))
+    
     try:
         with open('update_data.json', 'r') as f:
             update_data = json.load(f)
@@ -50,7 +97,7 @@ def index():
         update_data = {'lower': 0, 'upper': 100, 'referral': "None"}
 
     # Load data
-    df = pd.read_csv("data/FeedingDashboardData.csv")
+    df = pd.read_csv(f"data/{data_file}")
 
     # Columns for the new algorithm
     X = df[['feed_vol', 'oxygen_flow_rate', 'resp_rate', 'bmi']]
@@ -112,20 +159,37 @@ def toggle_dark_mode():
     # Return a 204 no content response, as we only need to toggle the state
     return ('', 204)
 
-@app.route('/index', methods=['POST'])
+@app.route('/upload', methods=['POST'])
 def upload_file():
-    # This route will handle the file upload
-    if 'file' in request.files:
-        file = request.files['file']
-        if file.filename != '':
-            # save and process files
-            pass
-    return redirect(url_for('index'))
+    # Check if the post request has the file part
+    if 'file' not in request.files:
+        flash('No file part')
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        flash('No selected file')
+        return jsonify({'error': 'No selected file'}), 400
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+        jsonify ({'success': 'File uploaded successfully'})
+        return redirect(url_for('index'))
+
+        
+    else:
+        flash('File type not supported. Please upload a CSV file.', 'error')
+        return jsonify({'error': 'File type not supported. Please upload a CSV file.'}), 400
+        
 
 @app.route('/graphs.html')
 def graphs():
+    data_file = recent_file() 
+    if data_file is None:
+        flash("No CSV files found in the folder.")
+        return redirect(url_for('upload'))
     # Load data
-    df = pd.read_csv("data/FeedingDashboardData.csv")
+    df = pd.read_csv(f"data/{data_file}")
 
     # Columns for the new algorithm
     X = df[['feed_vol', 'oxygen_flow_rate', 'resp_rate', 'bmi']]
@@ -184,7 +248,7 @@ def data():
     dark_mode = 'dark' if session.get('dark_mode') else ''
     return render_template('data.html', today = Today, data=data, dark_mode=dark_mode)
 
-@app.route('/upload.html')
+@app.route('/upload.html', methods=['GET'])
 def upload():
     #today's date
     Today = date.today().strftime("%B %d, %Y")
@@ -194,4 +258,6 @@ def upload():
     return render_template('upload.html', today = Today, data=data, dark_mode=dark_mode)
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True, port=5001)
+
+

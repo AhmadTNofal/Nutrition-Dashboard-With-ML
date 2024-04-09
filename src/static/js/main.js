@@ -65,19 +65,61 @@ button.onclick = () => {
     input.click();
 };
 
+
 // Handle file selection
 input.addEventListener("change", function (e) {
-    var fileName = e.target.files[0].name; // Get the name of the selected file
-    // Create form to display the selected file name and an upload button
-    let filedata = `
-        <form action="{{ url_for('upload') }}" method="post">
-        <div class="form">
-        <h4>${fileName}</h4>
-        <button class="btn">Upload</button>
-        </div>
-        </form>`;
-    // Update the drop area with the form
-    dropArea.innerHTML = filedata;
+    // Get the file from the input
+    var file = e.target.files[0];
+    
+    // Make sure a file was actually selected
+    if (file) {
+        // Create a new form element
+        var form = document.createElement("form");
+        form.action = "/upload";
+        form.method = "post";
+        form.enctype = "multipart/form-data";
+
+        // Create a new input for the file which will be visible and required
+        var fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.name = "file";
+        fileInput.accept = ".csv";
+        fileInput.required = true;
+        fileInput.style.display = "none";  // Hide this new input as well
+
+        // Add an event listener to this new input for when a file is selected
+        fileInput.addEventListener("change", function () {
+            // Submit the form when a new file is selected
+            form.submit();
+        });
+
+        // Append the file input to the form
+        form.appendChild(fileInput);
+
+        // Update the file input with the file the user originally selected
+        fileInput.files = e.target.files;
+
+        // Create a submit button for the form
+        var submitButton = document.createElement("button");
+        submitButton.type = "submit";
+        submitButton.className = "btn";
+        submitButton.textContent = "Upload";
+
+        // Append the submit button to the form
+        form.appendChild(submitButton);
+
+        // Create a label to display the selected file name
+        var fileNameLabel = document.createElement("label");
+        fileNameLabel.textContent = `Selected file: ${file.name}`;
+        form.appendChild(fileNameLabel);
+
+        // Update the drop area with the new form
+        dropArea.innerHTML = '';
+        dropArea.appendChild(form);
+
+        // Now, simulate a click on the new hidden file input to submit it
+        fileInput.click();
+    }
 });
 
 function updateLowerValue(val) {
