@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Select the container that holds the projects
     var projectsList = document.querySelector('.project-boxes');
     
-    // Add click event to switch to list view, remove grid view class and add list view class
     listView.addEventListener('click', function () {
         gridView.classList.remove('active');
         listView.classList.add('active');
@@ -38,17 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
         gridView.classList.add('active');
         listView.classList.remove('active');
         projectsList.classList.remove('jsListView');
-        projectsList.classList.add('jsGridView');
-    });
-
-    // Add click event to show messages section
-    document.querySelector('.messages-btn').addEventListener('click', function () {
-        document.querySelector('.messages-section').classList.add('show');
-    });
-
-    // Add click event to close messages section
-    document.querySelector('.messages-close').addEventListener('click', function() {
-        document.querySelector('.messages-section').classList.remove('show');
+        projectsList.classList.add('jsGridView'); 
     });
 });
 

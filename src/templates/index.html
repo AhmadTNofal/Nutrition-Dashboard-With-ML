@@ -189,13 +189,54 @@
                     ></span>
                   </div>
                   <p class="box-progress-percentage">{{ result.referral_probability }}%</p>
+                  <table>
+                    <tr>
+                      <th class="box-progress-percentage" style = "text-align: center;">patient_number</th>
+                      <th class="box-progress-percentage" style = "text-align: center;">encounter_id</th>
+                      <th class="box-progress-percentage" style = "text-align: center;">end_tidal_co2</th>
+                      <th class="box-progress-percentage" style = "text-align: center;">feed_vol</th>
+                      <th class="box-progress-percentage" style = "text-align: center;">feed_vol_adm</th>
+                      <th class="box-progress-percentage" style = "text-align: center;">fio2</th>
+                      <th class="box-progress-percentage" style = "text-align: center;">fio2_ratio</th>
+                      <th class="box-progress-percentage" style = "text-align: center;">insp_time</th>
+                      <th class="box-progress-percentage" style = "text-align: center;">oxygen_flow_rate</th>
+                      <th class="box-progress-percentage" style = "text-align: center;">peep</th>
+                      <th class="box-progress-percentage" style = "text-align: center;">pip</th>
+                      <th class="box-progress-percentage" style = "text-align: center;">resp_rate</th>
+                      <th class="box-progress-percentage" style = "text-align: center;">sip</th>
+                      <th class="box-progress-percentage" style = "text-align: center;">tidal_vol</th>
+                      <th class="box-progress-percentage" style = "text-align: center;">tidal_vol_actual</th>
+                      <th class="box-progress-percentage" style = "text-align: center;">tidal_vol_kg </th>
+                      <th class="box-progress-percentage" style = "text-align: center;">tidal_vol_spon</th>
+                      <th class="box-progress-percentage" style = "text-align: center;">bmi</th>
+                    </tr>
+                    <tr>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.patient_number }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.encounter_id }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.end_tidal_co2 }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.feed_vol }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.feed_vol_adm }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.fio2 }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.fio2_ratio }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.insp_time }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.oxygen_flow_rate }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.peep }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.pip }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.resp_rate }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.sip }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.tidal_vol }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.tidal_vol_actual }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.tidal_vol_kg }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.tidal_vol_spon }}</td>
+                      <td class="box-progress-percentage" style = "text-align: center;">{{ result.bmi }}</td> 
+                    </tr>
+                  </table>
                 </div>
                 <div class="project-box-footer">
                   <div class="participants">
-                    <p class = "Referral">
+                    <p class = "Referral" style = "color: {{ result.color }};">
                     Needs Referral: {{ result.needs_referral }}
                     <a href="data.html?encounterId={{ result.encounter_id }}">Show Details</a>
-                    </p>
                   </div>
                 </div>
               </div>
@@ -208,6 +249,8 @@
         </div>
       </div>
     </div>
+
+
       <script src="{{ url_for('static', filename='js/main.js') }}"></script> 
       <script>
         function updateAllButton() {
@@ -247,6 +290,7 @@
       }
       
       updateAllButton();
+
       </script>
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
 <script>

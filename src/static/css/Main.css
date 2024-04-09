@@ -359,6 +359,12 @@ font-size: 12px;
 order: 3;
 flex: 1;
 }
+.project-box table {
+    display: none;
+}
+.project-boxes.jsListView .project-box table {
+    display: table; 
+}
 .project-box {
 --main-color-card: #dbf6fd;
 border-radius: 30px;
@@ -398,24 +404,6 @@ position: relative;
 background-color: transparent;
 border: none;
 flex-shrink: 0;
-/*&:after, &:before {
-content: '';
-position: absolute;
-width: 6px;
-height: 6px;
-border-radius: 50%;
-background-color: var(--main-color);
-opacity: .8;
-left: 50%;
-transform: translatex(-50%);
-}
-&:before {
-top: 0;
-}
-&:after {
-bottom: 0;
-}
-*/
 }
 .more-wrapper {
 position: relative;
@@ -694,8 +682,8 @@ top: 10px;
 }
 
 .Referral {
-    font-size: 11.5px;
-    color: #a3a3a3;
+    font-size: 13.5px;
+    color: black;
     font-weight: bold;
 }
 
@@ -865,4 +853,14 @@ top: 10px;
     background-color: #a0c7e4;
     box-shadow: none;
     color: #2c5777;
+}
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+th{
+    padding-left: 3px;
+    padding-right: 3px;
 }

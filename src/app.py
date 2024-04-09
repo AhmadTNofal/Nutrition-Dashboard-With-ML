@@ -118,25 +118,44 @@ def index():
     probabilities = pipeline.predict_proba(X)
     confidence_scores = probabilities.max(axis=1) * 100
 
-    # Prepare initial output
+    # Prepare initial output for results
     initial_results = [{
         'patient_number': i + 1,
         'encounter_id': int(row['encounterId']),
-        'referral_probability': f"{conf_score:.2f}",
+        'referral_probability': f"{conf_score:.2f}",  # This is already formatted to 2 decimal places
         'needs_referral': "Yes" if pred_referral else "No",
-        'color': "red" if pred_referral else "green"
-    } for i, (row, pred_referral, conf_score) in enumerate(zip(df.to_dict('records'), predicted_referrals, confidence_scores))]
+        'color': "red" if pred_referral else "green",
+        'end_tidal_co2': f"{row['end_tidal_co2']:.2f}",
+        'feed_vol': f"{row['feed_vol']:.2f}",
+        'feed_vol_adm': f"{row['feed_vol_adm']:.2f}",
+        'fio2': f"{row['fio2']:.2f}",
+        'fio2_ratio': f"{row['fio2_ratio']:.2f}",
+        'insp_time': f"{row['insp_time']:.2f}",
+        'oxygen_flow_rate': f"{row['oxygen_flow_rate']:.2f}",
+        'peep': f"{row['peep']:.2f}",
+        'pip': f"{row['pip']:.2f}",
+        'resp_rate': f"{row['resp_rate']:.2f}",
+        'sip': f"{row['sip']:.2f}",
+        'tidal_vol': f"{row['tidal_vol']:.2f}",
+        'tidal_vol_actual': f"{row['tidal_vol_actual']:.2f}",
+        'tidal_vol_kg': f"{row['tidal_vol_kg']:.2f}",
+        'tidal_vol_spon': f"{row['tidal_vol_spon']:.2f}",
+        'bmi': f"{row['bmi']:.2f}",
+        'referral': row['referral']  # Assuming 'referral' is a string and doesn't need formatting
+        } for i, (row, pred_referral, conf_score) in enumerate(zip(df.to_dict('records'), predicted_referrals, confidence_scores))]
 
     # Filter results based on update_data criteria
     results = get_filtered_results(update_data, initial_results, confidence_scores)
+
 
     referrals = sum(res['needs_referral'] == "Yes" for res in results)
     count_no_referral = len(results) - referrals
     Today = date.today().strftime("%B %d, %Y")
     dark_mode = 'dark' if session.get('dark_mode') else ''
 
-    # Render the HTML template with the filtered results
+    # Render the HTML template with the filtered results and patient data
     return render_template('index.html', results=results, count=referrals, sum=len(results), today=Today, dark_mode=dark_mode)
+
 
 @app.route('/updateAll', methods=['POST'])
 def update_all():
