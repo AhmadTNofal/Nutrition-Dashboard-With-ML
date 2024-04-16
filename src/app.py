@@ -276,6 +276,13 @@ def upload():
     dark_mode = 'dark' if session.get('dark_mode') else ''
     return render_template('upload.html', today = Today, data=data, dark_mode=dark_mode)
 
+@app.route('/help.html')
+def help():
+    #today's date
+    Today = date.today().strftime("%B %d, %Y")
+    dark_mode = 'dark' if session.get('dark_mode') else ''
+    return render_template('help.html', today = Today, dark_mode=dark_mode)
+
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5001)
 
