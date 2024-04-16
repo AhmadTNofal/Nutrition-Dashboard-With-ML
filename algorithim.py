@@ -8,7 +8,7 @@ import pandas as pd
 df = pd.read_csv("data\FeedingDashboardData.csv")
 
 # Preprocessing
-X = df[['feed_vol', 'oxygen_flow_rate', 'resp_rate', 'bmi']]
+X = df[['end_tidal_co2','feed_vol','feed_vol_adm','fio2','fio2_ratio','insp_time', 'oxygen_flow_rate','peep','pip', 'resp_rate','sip','tidal_vol','tidal_vol_actual','tidal_vol_kg','tidal_vol_spon', 'bmi']]
 y = df['referral']
 
 # Pipeline for imputation, normalization, and model training

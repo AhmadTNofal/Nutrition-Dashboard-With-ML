@@ -51,7 +51,6 @@ def recent_file():
     else:
         print("No CSV files found in the folder.")
 
-
 def allowed_file(filename):
     return '.' in filename and \
             filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -100,7 +99,7 @@ def index():
     df = pd.read_csv(f"data/{data_file}")
 
     # Columns for the new algorithm
-    X = df[['feed_vol', 'oxygen_flow_rate', 'resp_rate', 'bmi']]
+    X = df[['end_tidal_co2','feed_vol','feed_vol_adm','fio2','fio2_ratio','insp_time', 'oxygen_flow_rate','peep','pip', 'resp_rate','sip','tidal_vol','tidal_vol_actual','tidal_vol_kg','tidal_vol_spon', 'bmi']]
     y = df['referral']
 
     # Pipeline for imputation, normalization, and model training
@@ -156,7 +155,6 @@ def index():
     # Render the HTML template with the filtered results and patient data
     return render_template('index.html', results=results, count=referrals, sum=len(results), today=Today, dark_mode=dark_mode)
 
-
 @app.route('/updateAll', methods=['POST'])
 def update_all():
     data = request.get_json()  # Get JSON data sent from the client
@@ -200,7 +198,6 @@ def upload_file():
         flash('File type not supported. Please upload a CSV file.', 'error')
         return jsonify({'error': 'File type not supported. Please upload a CSV file.'}), 400
         
-
 @app.route('/graphs.html')
 def graphs():
     data_file = recent_file() 
@@ -211,7 +208,7 @@ def graphs():
     df = pd.read_csv(f"data/{data_file}")
 
     # Columns for the new algorithm
-    X = df[['feed_vol', 'oxygen_flow_rate', 'resp_rate', 'bmi']]
+    X = df[['end_tidal_co2','feed_vol','feed_vol_adm','fio2','fio2_ratio','insp_time', 'oxygen_flow_rate','peep','pip', 'resp_rate','sip','tidal_vol','tidal_vol_actual','tidal_vol_kg','tidal_vol_spon', 'bmi']]
     y = df['referral']
 
     # Pipeline for imputation, normalization, and model training
