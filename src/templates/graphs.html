@@ -160,18 +160,24 @@
             <p> Need Referral: {{ count }} </p>
             <p class="time">{{ today }}</p>
           </div>
-          <div class="projects-section-line">
-            <div class="projects-status">
+
 
             
-              <div class="graph-container pie-chart-container">
-                <canvas id="pieChart"></canvas>
+              <div class="graphs-grid">
+                <div class="graph-container pie-chart-container">
+                  <canvas id="pieChart"></canvas>
+                </div>
+                <div class="graph-container histogram-container">
+                  <canvas id="histogram"></canvas>
+                </div>
+                <div class="graph-container complete-incomplete-container">
+                  <canvas id="completeIncompleteChart"></canvas>
+                </div>
+                <div class="graph-container tidal-volume-container">
+                  <canvas id="tidalVolumeChart"></canvas>
+                </div>
               </div>
-            </div>
-
-              <div class="graph-container histogram-container">
-                <canvas id="histogram"></canvas>
-              </div>
+              
 
               <div id="myModal" class="modal">
                 <div class="modal-content">
@@ -180,8 +186,7 @@
                 </div>
               </div>
 
-          </div>
-        </div>
+
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -274,6 +279,35 @@
           }
         };
       });
+
+      document.addEventListener('DOMContentLoaded', function () {
+        var ctxCompleteIncomplete = document.getElementById('completeIncompleteChart').getContext('2d');
+        var completeIncompleteChart = new Chart(ctxCompleteIncomplete, {
+            type: 'bar',
+            data: {
+                labels: ['Complete Data', 'Incomplete Data'],
+                datasets: [{
+                    label: 'Data Completeness',
+                    data: JSON.parse('{{ complete_data | safe }}'),
+                    backgroundColor: ['green', 'red'],
+                }]
+            }
+        });
+    
+        var ctxTidalVolume = document.getElementById('tidalVolumeChart').getContext('2d');
+        var tidalVolumeChart = new Chart(ctxTidalVolume, {
+            type: 'boxplot',  // Ensure you have a boxplot type available or use a compatible type
+            data: {
+                labels: ['Actual Tidal Volume', 'KG-based Tidal Volume'],
+                datasets: [{
+                    label: 'Tidal Volume Distribution',
+                    data: JSON.parse('{{ tidal_volume_data | safe }}'),
+                    backgroundColor: 'blue',
+                }]
+            }
+        });
+    });
+
     </script>
   </body>
 </html>

@@ -254,9 +254,26 @@ def graphs():
     # Convert data to JSON for JavaScript
     pie_data_json = json.dumps(pie_data)
     histogram_data_json = json.dumps(histogram_data)
+    
+    # Calculate complete and incomplete data counts
+    complete_data_count = (df.isnull().sum(axis=1) == 0).sum()
+    incomplete_data_count = len(df) - complete_data_count
+
+    # Convert int64 to native Python int for JSON serialization
+    complete_data_count = int(complete_data_count)
+    incomplete_data_count = int(incomplete_data_count)
+
+    # Prepare data for box plot (Tidal Volume)
+    tidal_vol_actual_data = df['tidal_vol_actual'].dropna().tolist()
+    tidal_vol_kg_data = df['tidal_vol_kg'].dropna().tolist()
+
+    # Serialize data to JSON
+    complete_data_json = json.dumps([complete_data_count, incomplete_data_count])
+    tidal_volume_data_json = json.dumps([tidal_vol_actual_data, tidal_vol_kg_data])
+
 
     # Render the HTML template with the results
-    return render_template('graphs.html', results=results, count=referrals, sum=len(results), today=Today, dark_mode=dark_mode, pie_data=pie_data_json, histogram_data=histogram_data_json,)
+    return render_template('graphs.html',results=results,count=referrals,sum=len(results),today=date.today().strftime("%B %d, %Y"),dark_mode='dark' if session.get('dark_mode') else '',pie_data=pie_data_json,histogram_data=histogram_data_json,complete_data=complete_data_json,tidal_volume_data=tidal_volume_data_json)
 
 @app.route('/data.html')
 def data():
@@ -278,7 +295,6 @@ def upload():
 
 @app.route('/help.html')
 def help():
-    #today's date
     Today = date.today().strftime("%B %d, %Y")
     dark_mode = 'dark' if session.get('dark_mode') else ''
     return render_template('help.html', today = Today, dark_mode=dark_mode)

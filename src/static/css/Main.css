@@ -184,6 +184,9 @@ overflow: hidden;
 height: 100%;
 display: flex;
 flex-direction: column;
+overflow-y: auto;
+overflow-x: auto; 
+max-height: calc(100vh); 
 }
 .projects-section-line {
 display: flex;
@@ -864,3 +867,25 @@ th{
     padding-left: 3px;
     padding-right: 3px;
 }
+
+
+.graphs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Creates two columns */
+    grid-gap: 20px; /* Adjust the gap between the graphs */
+    margin: 20px; /* Add some margin around the grid */
+}
+
+  /* Make sure your .graph-container has appropriate sizing */
+  .graph-container {
+    width: 100%; /* Full width of the grid column */
+    /* Other styles... */
+  }
+  
+  /* If the screen is too small, let the graphs stack vertically */
+  @media (max-width: 800px) {
+    .graphs-grid {
+      grid-template-columns: 1fr; /* Only one column on small screens */
+    }
+  }
+  
