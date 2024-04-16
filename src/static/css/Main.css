@@ -55,6 +55,7 @@ font-family: "Poppins", sans-serif;
 --button-border-dark: 1px solid transparent;
 --card-h4: #ffffff;
 --data-text: #ffffff;
+--help-content: #ffffff;
 }
 html, body {
 width: 100%;
@@ -735,8 +736,8 @@ top: 10px;
 
 .multi-range-slider {
     position: relative;
-    --range-width: calc(100% - 20px); /* Default width of the visual track */
-    --range-start: 0%; /* Default starting position of the visual track */
+    --range-width: calc(100% - 20px); 
+    --range-start: 0%; 
 }
 
 .multi-range-slider input[type="range"] {
@@ -781,11 +782,11 @@ top: 10px;
     content: '';
     position: absolute;
     width: 100%;
-    height: 5px; /* Height of the track */
-    background: #ddd; /* Color of the track */
+    height: 5px; 
+    background: #ddd; 
     top: 50%;
     transform: translateY(-50%);
-    z-index: 1; /* Ensure this is behind the thumbs */
+    z-index: 1; 
 }
 
 .multi-range-slider .slider::after {
@@ -800,7 +801,7 @@ top: 10px;
     width: var(--range-width);
 }
 
-/* Labels */
+
 .slider-labels {
     display: flex;
     justify-content: space-between;
@@ -876,16 +877,19 @@ th{
     margin: 20px; /* Add some margin around the grid */
 }
 
-  /* Make sure your .graph-container has appropriate sizing */
-  .graph-container {
-    width: 100%; /* Full width of the grid column */
-    /* Other styles... */
-  }
-  
-  /* If the screen is too small, let the graphs stack vertically */
-  @media (max-width: 800px) {
+
+.graph-container {
+    width: 100%;
+}
+
+
+@media (max-width: 800px) {
     .graphs-grid {
-      grid-template-columns: 1fr; /* Only one column on small screens */
+        grid-template-columns: 1fr; 
     }
-  }
-  
+}
+
+.help-content {
+    font-family: 'Courier New', Courier, monospace;
+    color: var(--data-text);
+}
