@@ -4,6 +4,7 @@
   <head>
     <title>Data</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/Main.css') }}" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
   </head>
   
   <body>
@@ -95,16 +96,39 @@
             <p>DATA</p>
             <p class="time">{{ today }}</p>
           </div>
+
           {% if data %}
           <div class = "data-container">
                   {% for key, value in data[0].items() %}
-                      <p class ="data-text">{{ key }}: {{ value }}</p>
+                      <p class ="data-text">{{ key }}: {{ value }}</p>                   
                   {% endfor %}
           {% else %}
               <p class = "data-text">No data found for the provided encounter ID.</p>
           {% endif %}
+          <button class="btn" id="export-pdf">Export Data to PDF</button>
           </div>
             <div class="view-actions">
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>     
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script> 
+      
+    <script>
+      document.getElementById('export-pdf').addEventListener('click', function() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+    
+        // Select the elements containing the data you want to print
+        const dataContainer = document.querySelector('.data-container').innerText;
+    
+        // Splitting the text by lines to add them to the document
+        const lines = dataContainer.split('\n');
+        let yPos = 10;
+        lines.forEach(line => {
+            doc.text(line, 10, yPos);
+            yPos += 10;
+        });
+    
+        // Save the PDF
+        doc.save('exported-data.pdf');
+    });
+    </script> 
   </body>
 </html>
