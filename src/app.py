@@ -75,11 +75,12 @@ def get_filtered_results(update_data, results, confidence_scores):
         if lower <= confidence_score <= upper:
             if referral_filter == "1" and result['needs_referral'] == "Yes":
                 filtered_results.append(result)
-            elif referral_filter == "0" and result['needs_referral'] == "No":
+            elif referral_filter == "2" and result['needs_referral'] == "No":
                 filtered_results.append(result)
             elif referral_filter == "None":
                 filtered_results.append(result)
     return filtered_results
+
 
 @app.route('/')
 @app.route('/index.html')
