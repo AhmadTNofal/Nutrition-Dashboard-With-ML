@@ -319,6 +319,7 @@ width: 25%;
 display: flex;
 border-radius: 10px;
 position: relative;
+flex-wrap: wrap;
 }
 .project-boxes.jsListView .project-box > * {
 margin-right: 24px;

@@ -247,6 +247,7 @@
                       <td class="box-progress-percentage" style = "text-align: center;">{{ result.bmi }}</td> 
                     </tr>
                   </table>
+                  <br>
                 </div>
                 <div class="project-box-footer">
                   <div class="participants">
@@ -313,9 +314,7 @@
   var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
   socket.on('data_updated', function(data) {
-    // React to the data update event
     console.log('Data updated', data);
-    // Here, you might want to refetch data for your page or directly update the UI
   });
 </script>
   </body>
